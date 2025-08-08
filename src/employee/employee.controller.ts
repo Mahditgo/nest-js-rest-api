@@ -1,13 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ValidationPipe } from '@nestjs/common';
+import { Ip, Controller, Get, Post, Body, Patch, Param, Delete, Query, ValidationPipe } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 // import { Prisma } from '@prisma/client';
 import { CreateEmployeeDto } from './dto/create-employee-dto';
 import { UpdateEmployeeDto } from './dto/update-employee-dto';
+import { MyLoggerService } from 'src/my-logger/my-logger.service';
 
 
 @Controller('employee')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
+  private readonly logger = new MyLoggerService(EmployeeService.name)
 
   @Post()
   create(@Body(ValidationPipe) createEmployeeDto: CreateEmployeeDto) {
@@ -15,7 +17,8 @@ export class EmployeeController {
   }
 
   @Get()
-  findAll(@Query('role') role?: "ADMIN" | "ENGINEER" | "INTERN") {
+  findAll(@Ip() ip : string, @Query('role') role?: "ADMIN" | "ENGINEER" | "INTERN") {
+    this.logger.log(`request for all ip ${ip}`, EmployeeController.name)
     return this.employeeService.findAll(role);
   }
 
